@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Secure Real-Time Multiplayer Game</title>
+    <meta
+      name="description"
+      content="An example for the fCC InfoSec Secure Real-Time Multiplayer Game project"
+    />
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="../public/reset.css" type="text/css" />
+    <link rel="stylesheet" href="../public/style.css" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Secure Real Time Multiplayer Game</h1>
+    </header>
+    <br/><br/>
+    <!-- <label id="reset_label"><span id="game_reset"></span></label> -->
+    <label id="reset_label"></label>
+    <label class="win_label"><span id="win_status"></span></label>
+    <label class="score_label">Score: <span id="player_score"></span></label>
+    <label class="rank_label"><span id="player_rank"></span></label>
+    <div class="container" id="gameScreen">
+      <div class="">
+        <canvas 
+          ref="game"
+          id="game-window" 
+          width="540" 
+          height="540"
+        >
+        </canvas>
+      </div>
+    </div>
+  </body>
+  <script src="../public/game.mjs" type="module"></script>
+</html>
