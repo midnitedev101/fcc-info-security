@@ -80,7 +80,6 @@ function getEdgeCoordinates(startPts, endPts) {
  * Define the player object with id, coordinates, score, etc.
  */
 function setPlayer(playerId, color) {
-  // console.log("setting player...");
   let playerStartPts = [Math.ceil(Math.random() * boardElementSize), Math.ceil(Math.random() * boardElementSize)];  // get random x, y values for player starting coordinates
   let playerEndPts = [playerStartPts[0] + 25, playerStartPts[1] + 40];    // assign x, y values for player end coordinates
   let playerCoordinates = getEdgeCoordinates(playerStartPts, playerEndPts);
@@ -106,13 +105,11 @@ function setPlayer(playerId, color) {
     "id": playerId,
     "score": 0,
     "rank": 1,
-    // "nextRank": 100,
     "x": playerStartPts[0],
     "y": playerStartPts[1],
     "edgeCoordinates": playerCoordinates,
     "playerColor": color,
   }
-  // console.log(playerList);
   return playerList;
 }
 
@@ -133,7 +130,6 @@ function generateCollectibleId() {
  * Define the collectible object with id, coordinates, score, etc.
  */
 function setCollectible() {
-  // console.log("setting collectible...")
   collectible = {};
   let collectibleStartPts = [Math.ceil(Math.random() * boardElementSize), Math.ceil(Math.random() * boardElementSize)];  // get random x, y values for player starting coordinates
   let collectibleEndPts = [collectibleStartPts[0] + 14, collectibleStartPts[1] + 20];    // assign x, y values for player end coordinates
@@ -253,27 +249,11 @@ io.on('connection', (socket) => {
     }
   });
 
-  // socket.on("deletePlayer", (args) => {
-  //   console.log("deleting player", args.id);
-  //   delete playerList[args.id];
-  //   io.emit("playerToClient", playerList);
-  // });
-
   socket.on("restartGame", (args, callback) => {
     let id = args["id"];
     let color = args["color"];
-    // activeGame = false;
-    // playerList = {};
-    // collectible = {};
     
     setPlayer(id, color); // set player (either as an additional player or the first one)
-
-    // console.log(playerList);
-    // console.log(collectible);
-    // callback({
-    //   playerList: playerList,
-    //   collectible: Object.keys(collectible).length === 0 ? setCollectible() : collectible,
-    // });
 
     io.emit("playerToClient", playerList);
     io.emit("collectibleToClient", Object.keys(collectible).length === 0 ? setCollectible() : collectible);
@@ -281,9 +261,6 @@ io.on('connection', (socket) => {
 
   socket.on("disconnecting", (reason, details) => {
     console.log("disconnecting...");
-    // the reason of the disconnection, for example "transport error"
-    // socket.emit("deletePlayer", {id: playerId});
-    // delete player[playerId];    // remove player if disconnected from game
     console.log(reason);
  
     if (details) {

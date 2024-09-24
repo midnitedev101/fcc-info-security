@@ -48,9 +48,6 @@ function drawPlayer() {
     /*** 
      * Change Player image color - https://codepen.io/szkmsy/pen/LovBVe and https://www.tutorialspoint.com/change-colour-of-an-image-drawn-on-an-html5-canvas-element
     */
-//    console.log(Object.entries(player));
-//    console.log(Object.entries(player).length);
-
     if (playerImage.complete) {    // checks if player image has already been loaded
         for (const [key, value] of Object.entries(player)) {
             context.shadowColor = playerColor[key];
@@ -75,7 +72,6 @@ function drawPlayer() {
 }
 
 document.addEventListener("keydown", (event) => {
-    // const keyCode = event.key;
     let speed = 5;
     pressedKeys[event.key] = true;
 
@@ -111,10 +107,6 @@ document.addEventListener("keydown", (event) => {
         }
     
         if (keyCodeValid) {
-            // context.clearRect(0, 0, canvas.width, canvas.height);
-            // socket.emit("updatePlayerOnServer", player);  // send player list to server after moving
-            // requestAnimationFrame(reAnimate);
-            // console.log(event.key);
             socket.emit("playerToServer", player[playerId]);
         }
     }
@@ -146,48 +138,44 @@ socket.on("connect", () => {    // connect with socket.io and initialize player
     socket.emit("initializeServer", {id: playerId, color: color}, (response) => {});
 });
 
+/***
+ * Receive player list on client to draw in their coordinates and display player info
+ */
 socket.on("playerToClient", (args) => {
     let pList = [];
     for (const [key, value] of Object.entries(args)) {
         player[key] = new Player({x: value["x"], y: value["y"], score: value["score"], id: value["id"]});  // set player as an instance of the Player class
-        // console.log(player[key]);
         playerColor[key] = value["playerColor"];
         pList.push(player[key]);
-        // console.log(key, value["id"], playerId, playerId == value["id"]);
-        // console.log(player[key]["score"]);
-        // if (value["id"] == playerId) {
-        //     console.log(pList);
-        //     rank.innerHTML = player[playerId].calculateRank(pList);
-        //     scoreboard.innerHTML = player[playerId]["score"];
-        // }
     }
 
     rank.innerHTML = player[playerId].calculateRank(pList);
     scoreboard.innerHTML = player[playerId]["score"];
-
-
     drawPlayer();
 });
 
+/***
+ * Receive collectible on client to draw in their coordinates
+ */
 socket.on("collectibleToClient", (args) => {
     reset_label.textContent = "";
     collectible = new Collectible({x: args["x"], y: args["y"], value: args["score"], id: args["id"]});  // set collectible as an instance of the Collectible class
     drawCollectible();
 });
 
+/***
+ * Receive event when player collides with collectible
+ */
 socket.on("collectibleCollided", (id, item) => {
     if (collectible["id"] == item["id"]) {
         player[id].collision(collectible);  // call Player class collision method to determine if item collided with is of Collectible class
-        // socket.emit("getPlayers", (response) => {
-        //     // console.log(response.players)
-        // });  // retrieve player objects from server to client
     }
 });
 
+/***
+ * Receive event when victory conditions are met and game needs to be restarted
+ */
 socket.on("resetGame", (id) => {
-    // console.log("cancelling reanimation");
-    // cancelAnimationFrame(gameReq);
-    // context.clearRect(0, 0, canvas.width, canvas.height);
     let color = "rgb(" + Math.ceil(255 * Math.random()) + "," + Math.ceil(255 * Math.random()) + "," + Math.ceil(255 * Math.random()) + ")";
     let cntDown = 10;
     allowKeyPress = false;
@@ -202,17 +190,9 @@ socket.on("resetGame", (id) => {
             drawPlayerSignal = false;
             drawCollectibleSignal = false;
             win_status.innerHTML = "";
-            // reset_label.textContent = "";
-
-            // console.log("going...");
-            // socket.emit("updateAfterGame", (response) => {  // reinitialize game by resetting players, collectible instances
 
             // need to set server flag, activeGame to false to reset collectible and player instances
-            socket.emit("restartGame", {id: playerId, color: color}, (response) => {
-                // console.log(response.playerList);
-                // console.log(response.collectible);
-                // allowKeyPress = true;
-            });  // reinitialize game by resetting players, collectible instances
+            socket.emit("restartGame", {id: playerId, color: color}, (response) => {});  // reinitialize game by resetting players, collectible instances
             allowKeyPress = true;
         }
         reset_label.textContent = `Game will be restarting in ${cntDown} seconds...`;
@@ -225,7 +205,7 @@ socket.on("clearBoard", () => {
 });
 
 /*** 
- * Receive event from server that a player has disconnected 
+ * Custom receive event from server that a player has disconnected 
  */
 socket.on("clientDisconnect", (socketId) => {
     console.log("client disconnecting");
@@ -246,6 +226,4 @@ socket.on("disconnect", (reason, details) => {
         // some additional context, for example the XMLHttpRequest object
         console.log(details.context);
     }
-
-
 });
